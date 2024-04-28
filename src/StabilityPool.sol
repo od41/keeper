@@ -1,20 +1,23 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "./StabilityPoolToken.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import {IERC20} from "@openzeppelin/contracts/interfaces/IERC20.sol";
 
-contract StabilityPool {
-    StabilityPoolToken public poolToken;
+contract StabilityPool is Ownable {
+    IERC20 internal stableOne; // Canto
+    IERC20 internal stableTwo; // Note
     mapping(address => uint256) public deposits;
     mapping(address => uint256) public borrows;
 
-    constructor(StabilityPoolToken _poolToken) {
-        poolToken = _poolToken;
-    }
+    constructor() Ownable(msg.sender) {}
 
+    /* 
+        Provide liquidity 
+    */
     function deposit(uint256 amount) external {
         // Transfer stablecoins from sender to this contract
-        poolToken.transferFrom(msg.sender, address(this), amount);
+        stableOne.transferFrom(msg.sender, address(this), amount);
         // Increase sender's deposit balance
         deposits[msg.sender] += amount;
     }
@@ -23,11 +26,14 @@ contract StabilityPool {
         // Ensure sender has enough balance to withdraw
         require(deposits[msg.sender] >= amount, "Insufficient balance");
         // Transfer stablecoins from this contract to sender
-        poolToken.transfer(msg.sender, amount);
+        stableOne.transfer(msg.sender, amount);
         // Decrease sender's deposit balance
         deposits[msg.sender] -= amount;
     }
 
+    /* 
+        Use liquidity
+     */
     function borrow(uint256 amount) external {
         // Implement borrow logic, using deposited stablecoins as collateral
     }
