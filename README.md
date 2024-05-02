@@ -1,66 +1,43 @@
-## Foundry
+# Keeper (WIP)
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Overview
 
-Foundry consists of:
+Keeper is a stability pool built for the Canto blockchain. In addition to providing capital efficient access to the stablecoins, it also acts as protection for your perpetual positions on Cadence.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Features
 
-## Documentation
+- Stable coin liquidity
+- Yield when you deposit NOTE
 
-https://book.getfoundry.sh/
+## Installation
+
+To install Keeper, follow these steps:
+
+1. Clone the repository: `git clone https://github.com/od41/keeper.git`
+2. Navigate to the project directory: `cd keeper`
+3. Install dependencies: `foundry init`
+4. Start the application: `foundry test`
 
 ## Usage
 
-### Build
+1. Connect your wallet to the [frontend](https://keeper-ui.vercel.app).
+2. Earn yield when you deposit either CANTO or NOTE to receive kUSD.
+3. Protect your perpetual positions on Cadence when you purchase a Keeper protect to prevent capital loss in margin calls.
 
-```shell
-$ forge build
-```
+## Technologies Used
 
-### Test
+- Frontend: NextJS
+- Contracts: Foundry
+- Protocol: Canto
 
-```shell
-$ forge test
-```
+## Contributors
 
-### Format
+- [Odafe](https://twitter.com/elder41_) (@od41)
 
-```shell
-$ forge fmt
-```
+## License
 
-### Gas Snapshots
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
 
-```shell
-$ forge snapshot
-```
+## Acknowledgements
 
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+We would like to thank the organizers of [Hackathon Name] for providing us with the opportunity to work on this project.

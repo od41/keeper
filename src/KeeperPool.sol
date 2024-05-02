@@ -5,8 +5,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20} from "@openzeppelin/contracts/interfaces/IERC20.sol";
 import "./KeeperSlip.sol";
 
-import "forge-std/console.sol";
-
 contract KeeperPool is Ownable {
     uint256 MAX_INT = 2 ** 256 - 1;
 
@@ -34,13 +32,10 @@ contract KeeperPool is Ownable {
         require(amount > 0, "Amount must be greater than 0");
         require(msg.sender != address(0), "Invalid sender address");
 
-        console.logAddress(address(this));
-        console.logAddress(address(liquidityToken));
-
         uint256 allowance = liquidityToken.allowance(msg.sender, address(this));
         require(allowance >= amount, "Insufficient allowance for token transfer");
         
-        liquidityToken.transferFrom(address(this), msg.sender, amount);
+        liquidityToken.transferFrom(msg.sender, address(this), amount);
 
         liquidityProviderBalance[msg.sender] += amount;
         totalLiquidityBalance += amount;
@@ -92,3 +87,4 @@ contract KeeperPool is Ownable {
         // Implement repay logic, reducing borrowed amount
     }
 }
+    
