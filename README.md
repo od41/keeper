@@ -2,12 +2,14 @@
 
 ## Overview
 
-Keeper is a stability pool built for the Canto blockchain. In addition to providing capital efficient access to the stablecoins, it also acts as protection for your perpetual positions on Cadence.
+Keeper is a lending protocol that provides flexible access to capital in a pinch. In addition to that, it also serves as "insurance" to trading positions on leveraged trading platforms e.g [Cadence Protocol](https://www.cadenceprotocol.io/).
 
 ## Features
 
-- Stable coin liquidity
-- Yield when you deposit NOTE
+1. **Borrowers**: deposit CANTO and receive NOTE backed stable kUSD
+2. **Stability providers**: deposit kUSD to earn yield. OR Deposit NOTE to earn yield in the fees from lenders. Yield in the form of CANTO from liquidated slips.
+3. **Stakers**: earn rewards that are paid out in NOTE and CANTO which are gotten from issuance, redemption and protection fees.
+4. **Traders**: avoid liquidations on external platforms or borrow from existing cadence positions to add margin and increase leverage.
 
 ## Installation
 
