@@ -86,7 +86,7 @@ contract KeeperPool is Ownable {
 
         KeeperSlip slip = new KeeperSlip(payable(address(keeperPool)), payable(address(trader)), amount);
         
-        liquidityToken.transfer(trader, amount);
+        liquidityToken.transfer(address(slip), amount);
 
         traderCollateralBalance[msg.sender] += msg.value;
         totalCollateralBalance += msg.value;
