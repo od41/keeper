@@ -22,7 +22,7 @@ Keeper is a lending protocol that provides flexible access to capital in a pinch
 
 [![Live demo icon](/images/live-demo.png)](https://keeper-ui.vercel.app/)
 
-[Video Demo](https://youtu.be/no-video)
+[Video Demo](https://youtu.be/Gd84XX2JXEg)
 
 ## Contracts
 
