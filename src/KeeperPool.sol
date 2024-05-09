@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import {IERC20} from "@openzeppelin/contracts/interfaces/IERC20.sol";
+import {IKUSD} from "./asd/IKUSD.sol";
 import "./KeeperSlip.sol";
 
 contract KeeperPool is Ownable {
@@ -16,7 +16,7 @@ contract KeeperPool is Ownable {
     uint256 public totalCollateralBalance;
     uint256 public totalDebtBalance;
 
-    IERC20 internal liquidityToken; // Note: stablecoin used as liquidity
+    IKUSD internal kUSD; // Note: Note backed stablecoin used as liquidity
 
     uint64 priceCantoUSD = 1427;
     uint64 decimalPlacesPrice = 4;
@@ -24,25 +24,27 @@ contract KeeperPool is Ownable {
     event LiquidtyDeposit(address liquidityProvider, uint256 value);
     event NewKeeperDeployed(address keeperSlip, address pool, address trader, uint256 value);
 
-    constructor(address _noteContractAddress) Ownable(msg.sender) {
-        liquidityToken = IERC20(_noteContractAddress);
+    constructor(address _kUSDAddress) Ownable(msg.sender) {
+        kUSD = IKUSD(_kUSDAddress);
     }
+    
 
-    /* 
-        Provide liquidity 
-    */
+    /// @notice Deposit Note into the pool to create new kUSD
+    /// @param amount The value of Note that is deposited 
+    /// and will mint equivalent amount of kUSD
     function depositLiquidity(uint256 amount) payable external {
         require(amount > 0, "Amount must be greater than 0");
         require(msg.sender != address(0), "Invalid sender address");
 
-        uint256 allowance = liquidityToken.allowance(msg.sender, address(this));
-        require(allowance >= amount, "Insufficient allowance for token transfer");
+        // mint new kUSD
+        kUSD.mint(amount);
 
-        if(allowance<amount) {
-            liquidityToken.approve(address(this), amount);
-        }
-        
-        liquidityToken.transferFrom(msg.sender, address(this), amount);
+        // approve transfer of tokens
+        kUSD.approve(address(this), amount);
+        // transfer to KeeperPool
+        bool res = kUSD.transferFrom(msg.sender, address(this), amount);
+
+        require(res, 'Error depositing liquidity to pool');
 
         liquidityProviderBalance[msg.sender] += amount;
         totalLiquidityBalance += amount;
@@ -55,8 +57,16 @@ contract KeeperPool is Ownable {
         // Ensure sender has enough balance to withdraw
         require(liquidityProviderBalance[msg.sender] >= amount, "Insufficient balance");
         require(totalLiquidityBalance >= amount, "Insufficient balance in contract");
-        // Transfer stablecoins from this contract to sender
-        liquidityToken.transfer(msg.sender, amount);
+
+        
+        // remove the amount of kUSD from circulation
+        kUSD.burn(amount);
+        // transfer amount to user
+        kUSD.transfer(msg.sender, amount);
+
+        // TODO: withdraw rewards 
+        // kUSD.withdrawCarry(amount);
+
         // Decrease sender's deposit balance
         liquidityProviderBalance[msg.sender] -= amount;
         totalLiquidityBalance -= amount;
@@ -86,7 +96,8 @@ contract KeeperPool is Ownable {
 
         KeeperSlip slip = new KeeperSlip(payable(address(keeperPool)), payable(address(trader)), amount);
         
-        liquidityToken.transfer(address(slip), amount);
+        // Transfer liquidity to slip where debtor can draw from whenever they like
+        kUSD.transfer(address(slip), amount);
 
         traderCollateralBalance[msg.sender] += msg.value;
         totalCollateralBalance += msg.value;
