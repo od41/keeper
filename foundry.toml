@@ -1,6 +1,7 @@
 [profile.default]
 src = "src"
 out = "out"
+script = "script"
 libs = ["lib"]
 remappings = [
     '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts',
@@ -9,6 +10,10 @@ remappings = [
     '@layerzerolabs/lz-evm-protocol-v2/=lib/LayerZero-v2/protocol',
     '@layerzerolabs/lz-evm-messagelib-v2/=lib/LayerZero-v2/messagelib',
 ]
+
+[profile.ci]
+  verbosity = 4
+
 [rpc_endpoints]
 canto-testnet = "https://canto-testnet.plexnode.wtf"
 canto-mainnet = "https://canto.slingshot.finance/"

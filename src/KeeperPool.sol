@@ -3,6 +3,9 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import {IKUSD} from "./asd/IKUSD.sol";
+import {CTokenInterface, CErc20Interface} from "./asd/CTokenInterfaces.sol";
+import {IERC20, ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./KeeperSlip.sol";
 
 contract KeeperPool is Ownable {
@@ -16,7 +19,8 @@ contract KeeperPool is Ownable {
     uint256 public totalCollateralBalance;
     uint256 public totalDebtBalance;
 
-    IKUSD internal kUSD; // Note: Note backed stablecoin used as liquidity
+    address public immutable kUSD; // Note: Note backed stablecoin used as liquidity
+    address public immutable cNote; // Reference to the cNOTE token
 
     uint64 priceCantoUSD = 1427;
     uint64 decimalPlacesPrice = 4;
@@ -24,8 +28,9 @@ contract KeeperPool is Ownable {
     event LiquidtyDeposit(address liquidityProvider, uint256 value);
     event NewKeeperDeployed(address keeperSlip, address pool, address trader, uint256 value);
 
-    constructor(address _kUSDAddress) Ownable(msg.sender) {
-        kUSD = IKUSD(_kUSDAddress);
+    constructor(address _kUSDAddress, address _cNote) Ownable(msg.sender) {
+        kUSD = _kUSDAddress;
+        cNote = _cNote;
     }
     
 
@@ -36,15 +41,18 @@ contract KeeperPool is Ownable {
         require(amount > 0, "Amount must be greater than 0");
         require(msg.sender != address(0), "Invalid sender address");
 
+        CErc20Interface cNoteToken = CErc20Interface(cNote);
+        IERC20 note = IERC20(cNoteToken.underlying());
+        IKUSD kUSDToken = IKUSD(kUSD);
+
+        // approve transfer note
+        note.approve(address(this), amount);
+        SafeERC20.safeTransferFrom(note, msg.sender, address(this), amount);
+        
+        note.approve(address(kUSD), amount);
+        
         // mint new kUSD
-        kUSD.mint(amount);
-
-        // approve transfer of tokens
-        kUSD.approve(address(this), amount);
-        // transfer to KeeperPool
-        bool res = kUSD.transferFrom(msg.sender, address(this), amount);
-
-        require(res, 'Error depositing liquidity to pool');
+        kUSDToken.mint(amount);
 
         liquidityProviderBalance[msg.sender] += amount;
         totalLiquidityBalance += amount;
@@ -58,11 +66,15 @@ contract KeeperPool is Ownable {
         require(liquidityProviderBalance[msg.sender] >= amount, "Insufficient balance");
         require(totalLiquidityBalance >= amount, "Insufficient balance in contract");
 
+        CErc20Interface cNoteToken = CErc20Interface(cNote);
+        IERC20 note = IERC20(cNoteToken.underlying());
+        IKUSD kUSDToken = IKUSD(kUSD);
         
         // remove the amount of kUSD from circulation
-        kUSD.burn(amount);
-        // transfer amount to user
-        kUSD.transfer(msg.sender, amount);
+        kUSDToken.burn(amount);
+
+        // transfer Note to user
+        SafeERC20.safeTransfer(note, msg.sender, amount);
 
         // TODO: withdraw rewards 
         // kUSD.withdrawCarry(amount);
@@ -95,9 +107,11 @@ contract KeeperPool is Ownable {
         require(totalLiquidityBalance >= amount, "Not enough liquidity in the pool");
 
         KeeperSlip slip = new KeeperSlip(payable(address(keeperPool)), payable(address(trader)), amount);
+
+        IKUSD kUSDToken = IKUSD(kUSD);
         
         // Transfer liquidity to slip where debtor can draw from whenever they like
-        kUSD.transfer(address(slip), amount);
+        kUSDToken.transfer(address(slip), amount);
 
         traderCollateralBalance[msg.sender] += msg.value;
         totalCollateralBalance += msg.value;

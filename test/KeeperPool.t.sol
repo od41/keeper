@@ -31,8 +31,9 @@ contract KeeperPoolTest is Test {
     function setUp() public {
         noteToken = new MockNote();
         noteTokenAddress = address(noteToken);
+        address mockKUSDAddress = noteTokenAddress;
         utils = new Utils();
-        kPool = new KeeperPool(noteTokenAddress);
+        kPool = new KeeperPool(mockKUSDAddress, noteTokenAddress);
 
         users = utils.createUsers(4);
 
