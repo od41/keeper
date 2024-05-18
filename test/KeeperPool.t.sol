@@ -55,19 +55,19 @@ contract KeeperPoolTest is Test {
         vm.deal(address(anotherLProvider), 100 ether);
     }
 
-    function tesLiquidityProvidertDesposit() public {
-        vm.startPrank(lProvider);
-        assertEq(lProvider.balance, 100 ether);
+    // function tesLiquidityProvidertDesposit() public {
+    //     vm.startPrank(lProvider);
+    //     assertEq(lProvider.balance, 100 ether);
 
-        vm.expectEmit(true, false, false, true);
-        emit LiquidtyDeposit(address(lProvider), 1 ether);
+    //     vm.expectEmit(true, false, false, true);
+    //     emit LiquidtyDeposit(address(lProvider), 1 ether);
 
-        kPool.depositLiquidity{value: 1 ether}(1 ether);
+    //     kPool.depositLiquidity{value: 1 ether}(1 ether);
 
-        assertEq(lProvider.balance, 99 ether);
+    //     assertEq(lProvider.balance, 99 ether);
 
-        vm.stopPrank();
-    }
+    //     vm.stopPrank();
+    // }
 
     function testRequestBorrowNotEnoughCollateral() public {
         vm.startPrank(lProvider);

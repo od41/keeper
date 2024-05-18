@@ -3,6 +3,7 @@ src = "src"
 out = "out"
 script = "script"
 libs = ["lib"]
+offline = true
 remappings = [
     '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts',
     'solidity-bytes-utils/=lib/solidity-bytes-utils',
@@ -17,5 +18,6 @@ remappings = [
 [rpc_endpoints]
 canto-testnet = "https://canto-testnet.plexnode.wtf"
 canto-mainnet = "https://canto.slingshot.finance/"
+hardhat-node = "http://127.0.0.1:8545/"
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

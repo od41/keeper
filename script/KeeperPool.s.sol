@@ -11,7 +11,7 @@ contract KeeperPoolScript is Script {
         uint pk = vm.envUint("MY_WALLET_PRIVATE_KEY");
         bool isTestnet = vm.envBool("IS_CANTO_TESTNET");
 
-        address kUSDAddress = address(0x9B233DC10BCe118fdFc3797Ac928e50f2303eBf8);
+        address kUSDAddress = address(0x987D567B56b3186f0fea777Bc3c5723DDb52bfB8);
         address cNoteAddress = isTestnet ? address(0x04E52476d318CdF739C38BD41A922787D441900c) : address(0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C);
 
         vm.startBroadcast(pk);

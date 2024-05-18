@@ -8,6 +8,9 @@ interface IKUSD {
     /// @dev User needs to approve the asD contract for _amount of NOTE
     function mint(uint256 _amount) external;
 
+
+    function mintFromContract(uint256 _amount, address _account) external;
+
     /// @notice Burn amount of asD tokens to get back NOTE. Like when minting, the NOTE:asD exchange rate is always 1:1
     /// @param _amount Amount of tokens to burn
     function burn(uint256 _amount) external;

@@ -34,25 +34,23 @@ contract KeeperPool is Ownable {
     }
     
 
-    /// @notice Deposit Note into the pool to create new kUSD
-    /// @param amount The value of Note that is deposited 
-    /// and will mint equivalent amount of kUSD
-    function depositLiquidity(uint256 amount) payable external {
+    /// @notice Deposit KUSD into the pool to create new kUSD
+    /// @param amount The value of KUSD that is deposited
+    function depositLiquidity(uint256 amount) external {
         require(amount > 0, "Amount must be greater than 0");
         require(msg.sender != address(0), "Invalid sender address");
 
+        // transfer note
         CErc20Interface cNoteToken = CErc20Interface(cNote);
         IERC20 note = IERC20(cNoteToken.underlying());
-        IKUSD kUSDToken = IKUSD(kUSD);
-
-        // approve transfer note
-        note.approve(address(this), amount);
         SafeERC20.safeTransferFrom(note, msg.sender, address(this), amount);
-        
+
+        // approve asd contract to spend for this contract's behalf
         note.approve(address(kUSD), amount);
         
         // mint new kUSD
-        kUSDToken.mint(amount);
+        IKUSD kUSDToken = IKUSD(kUSD);
+        kUSDToken.mint(amount); // call the asdOFT mint
 
         liquidityProviderBalance[msg.sender] += amount;
         totalLiquidityBalance += amount;
