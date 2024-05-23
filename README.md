@@ -2,9 +2,9 @@
 
 ## Overview
 
-Keeper is a lending protocol that provides flexible access to capital in a pinch. In addition to that, it also serves as "insurance" to trading positions on leveraged trading platforms e.g [Cadence Protocol](https://www.cadenceprotocol.io/).
+Keeper is a DeFi solution that combines automated Stop-Loss and Take-Profit Orders, on-demand stablecoins, and passive yield generation. Together, these features empower traders to maximize gains, minimize losses, and have more control over their trading positions; for example on [Cadence](https://www.cadenceprotocol.io/).
 
-## Canto Protocol
+## Canto Tools
 
 1. ASD (Automated Stablecoin Deployment): with the Note backed stablecoin SDK on the Canto network,Keeper receives Note deposits and mints a new stablecoin called kUSD.
 
@@ -23,6 +23,9 @@ Keeper is a lending protocol that provides flexible access to capital in a pinch
 [![Live demo icon](/images/live-demo.png)](https://keeper-ui.vercel.app/)
 
 [Video Demo](https://youtu.be/Gd84XX2JXEg)
+
+## Architecture
+![Screenshot of a borrow on Keeper](/images/keeper-architecture-diagram.png)
 
 ## Contracts
 
