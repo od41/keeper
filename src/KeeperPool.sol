@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity 0.8.22;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import {IKUSD} from "./asd/IKUSD.sol";
@@ -84,27 +84,20 @@ contract KeeperPool is Ownable {
 
     /* 
         Use liquidity
-     */
-    function borrow(address keeperPool, address trader, uint256 amount)
+    */
+    function borrow(address trader, uint256 amount)
         payable
         external
         returns (address)
     {
-        // deposit collateral e.g which is CANTO
-        // collateral must be 120 * amount (over collateralized) by 120%
-        
-        // Implement borrow logic, using deposited Canto or CAD as collateral'
-        // put up something
-        // get liquidity to their wallet
-        // pay directly to the CAD pool
-        // make it a whitelist thing, where you pay directly to whatever protocol needs protection
 
         require(amount < MAX_INT, "Too close to MAX INT");
         uint256 collateralInUSD = cantoInUSD(msg.value);
+        // TODO: get price from oracle
         require(collateralInUSD >= (((amount * 10**decimalPlacesPrice) * 120) / 100) + (amount * 10**decimalPlacesPrice), "Collateral is too low");
         require(totalLiquidityBalance >= amount, "Not enough liquidity in the pool");
 
-        KeeperSlip slip = new KeeperSlip(payable(address(keeperPool)), payable(address(trader)), amount);
+        KeeperSlip slip = new KeeperSlip(payable(address(this)), payable(address(trader)), amount, kUSD);
 
         IKUSD kUSDToken = IKUSD(kUSD);
         
@@ -125,9 +118,5 @@ contract KeeperPool is Ownable {
     function cantoInUSD(uint256 amount) view public returns(uint256 inUSD) {
         if(amount == 0) return 0;
         inUSD = (amount * priceCantoUSD);
-    }
-
-    function repay(uint256 amount) external {
-        // Implement repay logic, reducing borrowed amount
     }
 }

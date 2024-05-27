@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.22;
+
 interface CTokenInterface {
     function mint(uint256 mintAmount) external returns (uint256);
 

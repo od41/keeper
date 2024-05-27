@@ -73,7 +73,7 @@ contract KeeperPoolTest is Test {
         vm.startPrank(lProvider);
 
         vm.expectRevert("Not enough collateral in the pool");
-        kPool.borrow(address(this), address(trader), 1 ether);
+        kPool.borrow(address(trader), 1 ether);
 
         vm.stopPrank();
     }
