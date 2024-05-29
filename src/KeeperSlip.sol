@@ -61,7 +61,7 @@ contract KeeperSlip {
         require((_amount + withdrawnAmount) <= coverAmount, "Not enough KUSD debt in this slip");
         IKUSD kUSDToken = IKUSD(kUSD);
 
-        kUSDToken.transfer(address(msg.sender), _amount);
+        kUSDToken.transfer(msg.sender, _amount);
 
         withdrawnAmount = withdrawnAmount - _amount;
         emit KeeperPoolWithdrawal(address(this), _amount);
@@ -75,11 +75,6 @@ contract KeeperSlip {
 
         payable(address(pool)).transfer(address(this).balance);
 
-        destroy();
-    }
-
-    function destroy() internal {
-        require(!isActive, "This slip must be active");
         isActive = false;
     }
 }

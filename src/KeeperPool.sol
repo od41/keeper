@@ -11,10 +11,10 @@ import "./KeeperSlip.sol";
 contract KeeperPool is Ownable {
     uint256 MAX_INT = 2 ** 256 - 1;
 
-    mapping(address => uint256) traderCollateralBalance;
-    mapping(address => uint256) traderDebtBalance;
-    mapping(address => uint256) liquidityProviderBalance;
-    
+    mapping(address => uint256) public traderCollateralBalance;
+    mapping(address => uint256) public traderDebtBalance;
+    mapping(address => uint256) public liquidityProviderBalance;
+
     uint256 public totalLiquidityBalance;
     uint256 public totalCollateralBalance;
     uint256 public totalDebtBalance;
@@ -32,7 +32,6 @@ contract KeeperPool is Ownable {
         kUSD = _kUSDAddress;
         cNote = _cNote;
     }
-    
 
     /// @notice Deposit KUSD into the pool to create new kUSD
     /// @param amount The value of KUSD that is deposited
@@ -47,16 +46,15 @@ contract KeeperPool is Ownable {
 
         // approve asd contract to spend for this contract's behalf
         note.approve(address(kUSD), amount);
-        
+
         // mint new kUSD
         IKUSD kUSDToken = IKUSD(kUSD);
         kUSDToken.mint(amount); // call the asdOFT mint
 
         liquidityProviderBalance[msg.sender] += amount;
         totalLiquidityBalance += amount;
-        
-        emit LiquidtyDeposit(msg.sender, amount);
 
+        emit LiquidtyDeposit(msg.sender, amount);
     }
 
     function withdrawLiquidity(uint256 amount) external {
@@ -67,14 +65,14 @@ contract KeeperPool is Ownable {
         CErc20Interface cNoteToken = CErc20Interface(cNote);
         IERC20 note = IERC20(cNoteToken.underlying());
         IKUSD kUSDToken = IKUSD(kUSD);
-        
+
         // remove the amount of kUSD from circulation
         kUSDToken.burn(amount);
 
         // transfer Note to user
         SafeERC20.safeTransfer(note, msg.sender, amount);
 
-        // TODO: withdraw rewards 
+        // TODO: withdraw rewards
         // kUSD.withdrawCarry(amount);
 
         // Decrease sender's deposit balance
@@ -85,22 +83,20 @@ contract KeeperPool is Ownable {
     /* 
         Use liquidity
     */
-    function borrow(address trader, uint256 amount)
-        payable
-        external
-        returns (address)
-    {
-
+    function borrow(address trader, uint256 amount) external payable returns (address) {
         require(amount < MAX_INT, "Too close to MAX INT");
         uint256 collateralInUSD = cantoInUSD(msg.value);
         // TODO: get price from oracle
-        require(collateralInUSD >= (((amount * 10**decimalPlacesPrice) * 120) / 100) + (amount * 10**decimalPlacesPrice), "Collateral is too low");
+        require(
+            collateralInUSD >= (((amount * 10 ** decimalPlacesPrice) * 120) / 100) + (amount * 10 ** decimalPlacesPrice),
+            "Collateral is too low"
+        );
         require(totalLiquidityBalance >= amount, "Not enough liquidity in the pool");
 
         KeeperSlip slip = new KeeperSlip(payable(address(this)), payable(address(trader)), amount, kUSD);
 
         IKUSD kUSDToken = IKUSD(kUSD);
-        
+
         // Transfer liquidity to slip where debtor can draw from whenever they like
         kUSDToken.transfer(address(slip), amount);
 
@@ -115,8 +111,8 @@ contract KeeperPool is Ownable {
         return address(slip);
     }
 
-    function cantoInUSD(uint256 amount) view public returns(uint256 inUSD) {
-        if(amount == 0) return 0;
+    function cantoInUSD(uint256 amount) public view returns (uint256 inUSD) {
+        if (amount == 0) return 0;
         inUSD = (amount * priceCantoUSD);
     }
 }
