@@ -25,8 +25,9 @@ contract KeeperPool is Ownable {
     uint64 priceCantoUSD = 1427;
     uint64 decimalPlacesPrice = 4;
 
-    event LiquidtyDeposit(address liquidityProvider, uint256 value);
-    event NewKeeperDeployed(address keeperSlip, address pool, address trader, uint256 value);
+    event LiquidtyDeposit(address indexed liquidityProvider, uint256 value);
+    event LiquidtyWithdrawal(address indexed liquidityProvider, uint256 value);
+    event NewKeeperSlip(address indexed keeperSlip, address indexed pool, address indexed trader, uint256 value);
 
     constructor(address _kUSDAddress, address _cNote) Ownable(msg.sender) {
         kUSD = _kUSDAddress;
@@ -106,7 +107,7 @@ contract KeeperPool is Ownable {
         traderDebtBalance[msg.sender] += amount;
         totalLiquidityBalance -= amount;
 
-        emit NewKeeperDeployed(address(slip), address(this), trader, amount);
+        emit NewKeeperSlip(address(slip), address(this), trader, amount);
 
         return address(slip);
     }
