@@ -2,6 +2,7 @@
 pragma solidity 0.8.22;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@redstone-finance/evm-connector/contracts/data-services/MainDemoConsumerBase.sol";
 import {IKUSD} from "./asd/IKUSD.sol";
 import {CTokenInterface, CErc20Interface} from "./asd/CTokenInterfaces.sol";
 import {IERC20, ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
