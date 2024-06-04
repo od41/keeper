@@ -2,7 +2,6 @@
 pragma solidity 0.8.22;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@redstone-finance/evm-connector/contracts/data-services/MainDemoConsumerBase.sol";
 import {IKUSD} from "./asd/IKUSD.sol";
 import {CTokenInterface, CErc20Interface} from "./asd/CTokenInterfaces.sol";
 import {IERC20, ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -30,7 +29,7 @@ contract KeeperPool is Ownable {
     event LiquidtyWithdrawal(address indexed liquidityProvider, uint256 value);
     event NewKeeperSlip(address indexed keeperSlip, address indexed pool, address indexed trader, uint256 value);
 
-    constructor(address _kUSDAddress, address _cNote) Ownable(msg.sender) {
+    constructor(address _kUSDAddress, address _cNote) {
         kUSD = _kUSDAddress;
         cNote = _cNote;
     }
@@ -116,5 +115,9 @@ contract KeeperPool is Ownable {
     function cantoInUSD(uint256 amount) public view returns (uint256 inUSD) {
         if (amount == 0) return 0;
         inUSD = (amount * priceCantoUSD);
+    }
+
+    function priceOfCanto() public view returns (uint256 cantoPrice) {
+        return 1;
     }
 }
