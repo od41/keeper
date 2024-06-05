@@ -7,9 +7,13 @@ import {CTokenInterface, CErc20Interface} from "./asd/CTokenInterfaces.sol";
 import {IERC20, ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./KeeperSlip.sol";
+import "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 
 contract KeeperPool is Ownable {
     uint256 MAX_INT = 2 ** 256 - 1;
+
+    IPyth pyth;
+    bytes32 cantoUsdPriceId;
 
     mapping(address => uint256) public traderCollateralBalance;
     mapping(address => uint256) public traderDebtBalance;
@@ -29,9 +33,12 @@ contract KeeperPool is Ownable {
     event LiquidtyWithdrawal(address indexed liquidityProvider, uint256 value);
     event NewKeeperSlip(address indexed keeperSlip, address indexed pool, address indexed trader, uint256 value);
 
-    constructor(address _kUSDAddress, address _cNote) {
+    constructor(address _kUSDAddress, address _cNote, address _pyth, bytes32 _cantoUsdPriceId) Ownable(msg.sender) {
         kUSD = _kUSDAddress;
         cNote = _cNote;
+
+        pyth = IPyth(_pyth);
+        cantoUsdPriceId = _cantoUsdPriceId;
     }
 
     /// @notice Deposit KUSD into the pool to create new kUSD
@@ -84,12 +91,17 @@ contract KeeperPool is Ownable {
     /* 
         Use liquidity
     */
-    function borrow(address trader, uint256 amount) external payable returns (address) {
+    function borrow(address trader, uint256 amount, bytes[] calldata pythUpdateData)
+        external
+        payable
+        returns (address)
+    {
+        uint256 cantoPriceInWei = getPriceOfCanto(pythUpdateData);
         require(amount < MAX_INT, "Too close to MAX INT");
-        uint256 collateralInUSD = cantoInUSD(msg.value);
-        // TODO: get price from oracle
+        uint256 collateralDeposit = ((amount / cantoPriceInWei) * 200) / 1000 + (amount / cantoPriceInWei);
         require(
-            collateralInUSD >= (((amount * 10 ** decimalPlacesPrice) * 120) / 100) + (amount * 10 ** decimalPlacesPrice),
+            msg.value
+                >= collateralDeposit,
             "Collateral is too low"
         );
         require(totalLiquidityBalance >= amount, "Not enough liquidity in the pool");
@@ -117,7 +129,14 @@ contract KeeperPool is Ownable {
         inUSD = (amount * priceCantoUSD);
     }
 
-    function priceOfCanto() public view returns (uint256 cantoPrice) {
-        return 1;
+    function getPriceOfCanto(bytes[] calldata pythUpdateData) public payable returns (uint256) {
+        if (true) {
+            uint256 updateFee = pyth.getUpdateFee(pythUpdateData);
+            pyth.updatePriceFeeds{value: updateFee}(pythUpdateData);
+        }
+        PythStructs.Price memory price = pyth.getPrice(cantoUsdPriceId);
+        uint256 cantoPrice18Decimals =
+            (uint256(uint64(price.price)) * (10 ** 18)) / (10 ** uint8(uint32(-1 * price.expo)));
+        return cantoPrice18Decimals;
     }
 }
